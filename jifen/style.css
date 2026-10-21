@@ -186,3 +186,10 @@ textarea.roster { min-height: 150px; line-height: 1.6; resize: vertical; }
 button:focus { outline: none; }
 button:focus-visible, .cell:focus-visible, .card:focus-visible { outline: 3px solid var(--accent-2); outline-offset: 2px; }
 .sheet .reasons + .row, .sheet .row { margin-top: 10px; }
+
+/* 抽题页顶栏：下拉占一整行；舞台里的按钮不要被 flex 拉伸 */
+.topbar .left { white-space: nowrap; }
+.quizbar { flex-wrap: wrap; row-gap: 10px; }
+.quizbar select.field { flex: 1 1 100%; min-width: 0; width: 100%; order: -1; }
+.quizbar::after { order: 98; }
+.stage .btn, .stage .ansbtn { flex: none; width: auto; min-width: 120px; height: 44px; padding: 0 20px; margin-top: 14px; background: var(--soft); }
