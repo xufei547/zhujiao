@@ -1,0 +1,147 @@
+:root {
+  --accent: #C2552B;
+  --plus: #2F9E63;
+  --minus: #D9534F;
+  --bg: #FAF8F3;
+  --card: #FFFFFF;
+  --ink: #2B2622;
+  --muted: #8A8178;
+  --line: #E6E0D6;
+  --soft: #F1EDE5;
+  --radius: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg); color: var(--ink);
+  padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  -webkit-tap-highlight-color: transparent;
+}
+button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+main {
+  padding: 12px 12px 16px;
+  padding-left: calc(12px + env(safe-area-inset-left));
+  padding-right: calc(12px + env(safe-area-inset-right));
+}
+
+/* 顶栏 */
+.topbar { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.topbar .date { flex: 1; text-align: center; font-size: 17px; font-weight: 600; }
+.topbar .date small { display: block; font-size: 12px; color: var(--muted); font-weight: 400; }
+.iconbtn { width: 44px; height: 44px; border-radius: 50%; background: var(--card); font-size: 20px; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+.actions { display: flex; gap: 8px; margin-bottom: 10px; }
+.btn { flex: 1; height: 44px; border-radius: var(--radius); background: var(--card); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+.btn.primary { background: var(--accent); color: #fff; }
+.btn:disabled { opacity: .45; }
+
+/* 表格 */
+.grid { background: var(--card); border-radius: var(--radius); overflow-x: auto; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.grid table { width: 100%; border-collapse: collapse; }
+.grid th, .grid td { padding: 6px 4px; text-align: center; border-bottom: 1px solid var(--line); }
+.grid td { vertical-align: middle; }
+.grid th { font-size: 13px; color: var(--muted); font-weight: 500; }
+.grid th:first-child, .grid td:first-child { text-align: left; padding-left: 10px; width: 1%; white-space: nowrap; }
+.grid tr:last-child td { border-bottom: 0; }
+.name { font-size: 16px; font-weight: 700; padding: 8px 6px 8px 0; min-height: 44px; display: inline-flex; align-items: center; }
+
+/* 空状态 */
+.empty { text-align: center; padding: 48px 16px; color: var(--muted); }
+.empty img { width: 200px; height: auto; margin-bottom: 8px; }
+.empty p { margin-bottom: 16px; }
+.empty .btn { flex: none; width: 70%; margin: 0 auto; }
+
+/* 底部标签 */
+.tabs { position: fixed; left: 0; right: 0; bottom: 0; display: flex; background: var(--card); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); }
+.tab { flex: 1; height: 56px; font-size: 15px; color: var(--muted); }
+.tab.active, .tab[aria-current] { color: var(--accent); font-weight: 700; }
+
+/* 提示 */
+.toast { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); background: rgba(43,38,34,.92); color: #fff; padding: 10px 16px; border-radius: 20px; font-size: 14px; z-index: 50;
+  display: flex; align-items: center; width: max-content; max-width: calc(100vw - 32px); }
+.toast[hidden] { display: none; }
+.has-sheet .toast { bottom: auto; top: calc(12px + env(safe-area-inset-top)); }
+
+/* 弹层：反馈文案、备份、粘贴恢复、页内确认/输入框 */
+.sheet-mask { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 40; display: flex; align-items: flex-end; }
+.sheet { max-height: 85vh; overflow-y: auto; width: 100%; background: var(--card); border-radius: 18px 18px 0 0; padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); }
+.sheet h2 { font-size: 17px; margin-bottom: 10px; }
+.sheet textarea { font: inherit; width: 100%; min-height: 180px; border: 1px solid var(--line); border-radius: 10px; padding: 10px; font-size: 16px; line-height: 1.5; resize: vertical; }
+.sheet input { width: 100%; height: 44px; border: 1px solid var(--line); border-radius: 10px; padding: 0 10px; font-size: 16px; }
+.sheet .msg { font-size: 16px; line-height: 1.5; padding: 4px 0 2px; }
+.sheet .row { display: flex; gap: 8px; margin-top: 12px; }
+.sheet .btn:not(.primary), .section .btn:not(.primary) { background: var(--soft); }
+
+/* 名单页 */
+.section { background: var(--card); border-radius: var(--radius); padding: 12px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.section h2 { font-size: 15px; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+.item { display: flex; align-items: center; gap: 8px; min-height: 44px; border-bottom: 1px solid var(--line); }
+.item:last-child { border-bottom: 0; }
+.item .label { flex: 1; font-size: 16px; }
+.item .small { flex: none; min-width: 44px; height: 44px; padding: 0 10px; border-radius: 10px; background: var(--soft); font-size: 13px; }
+.item .small:disabled { opacity: .45; }
+.addrow { display: flex; gap: 8px; margin-top: 8px; }
+.addrow input { flex: 1; height: 44px; border: 1px solid var(--line); border-radius: 10px; padding: 0 10px; font-size: 16px; }
+.addrow .btn { flex: none; width: 88px; }
+.tpl label { display: block; font-size: 13px; color: var(--muted); margin: 8px 0 4px; }
+.tpl input { width: 100%; height: 40px; border: 1px solid var(--line); border-radius: 10px; padding: 0 10px; font-size: 16px; }
+.hint { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+.foot { text-align: center; color: var(--muted); font-size: 12px; line-height: 1.6; padding: 16px 0 4px; }
+
+/* 分段开关 */
+.seg { display: inline-flex; background: var(--soft); border-radius: 12px; padding: 3px; margin-bottom: 10px; }
+.seg button { min-height: 44px; padding: 0 14px; border-radius: 10px; font-size: 14px; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--card); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+
+/* 学生卡片 */
+.cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+@media (min-width: 400px) { .cards { grid-template-columns: repeat(3, 1fr); } }
+.card { background: var(--card); border-radius: var(--radius); min-height: 72px; padding: 10px 12px; text-align: left; box-shadow: 0 1px 3px rgba(0,0,0,.06); display: flex; flex-direction: column; gap: 2px; }
+.card .nm { font-size: 16px; font-weight: 700; }
+.card .total { font-size: 28px; font-weight: 800; line-height: 1.1; }
+.card .today { font-size: 13px; }
+.plus { color: var(--plus); }  .minus { color: var(--minus); }
+
+/* 理由网格（加分弹层） */
+.reasons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 8px 0; }
+.reason { height: 48px; border-radius: 12px; color: #fff; font-weight: 600; font-size: 15px; }
+.reason.plus { background: var(--plus); }  .reason.minus { background: var(--minus); }
+.reason.custom { background: var(--soft); color: var(--ink); }
+
+/* 记录行 */
+.log { background: var(--card); border-radius: var(--radius); box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.log .row { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid var(--line); min-height: 48px; }
+.log .row:last-child { border-bottom: 0; }
+.log .when { font-size: 12px; color: var(--muted); width: 64px; flex: none; }
+.log .who { font-weight: 600; flex: none; }
+.log .why { flex: 1; color: var(--muted); font-size: 14px; }
+.log .delta { font-weight: 700; flex: none; }
+.log .undo { flex: none; min-width: 44px; min-height: 44px; padding: 0 10px; border-radius: 10px; background: var(--soft); font-size: 13px; }
+
+/* toast 撤销按钮 */
+/* 负外边距：按钮点按区够 44px 高，又不把提示条撑高 */
+.toast button { flex: none; min-width: 44px; min-height: 44px; margin: -12px -8px -12px 8px; padding: 0 8px; color: #FFD9C7; font-weight: 700; text-decoration: underline; }
+
+/* 加分页顶栏：班级名可点改；「全班」「播报」是文字按钮 */
+.classname { flex: 1; min-width: 0; min-height: 44px; text-align: left; font-size: 18px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.topbar .iconbtn { width: auto; min-width: 44px; padding: 0 14px; border-radius: 22px; font-size: 15px; font-weight: 600; }
+
+/* 加分弹层标题里的总分、自定义对话框 */
+.sheet h2 small { margin-left: 8px; font-size: 14px; font-weight: 400; color: var(--muted); }
+.sheet label { display: block; font-size: 13px; color: var(--muted); margin: 8px 0 4px; }
+.sheet .err { min-height: 1.4em; margin-top: 8px; font-size: 14px; color: var(--minus); }
+
+/* 记录行：名字和理由可能很长，允许省略 */
+.log .who { max-width: 6em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.log .why { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 播报弹层里的「今天 / 本周」 */
+.sheet .seg { display: flex; }
+.sheet .seg button { flex: 1; }
+
+/* 名单页：班级名输入框、多行添加框、清零按钮 */
+.section .field { width: 100%; height: 44px; border: 1px solid var(--line); border-radius: 10px; padding: 0 10px; font: inherit; font-size: 16px; }
+.addrow textarea { flex: 1; min-width: 0; min-height: 44px; border: 1px solid var(--line); border-radius: 10px; padding: 10px; font: inherit; font-size: 16px; line-height: 1.4; resize: vertical; }
+.section .addrow .btn:only-child { width: 100%; flex: 1; }
+.item .label { min-width: 0; overflow-wrap: anywhere; }
+.btn.danger { color: var(--minus); }

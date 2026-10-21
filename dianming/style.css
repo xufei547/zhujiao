@@ -1,0 +1,161 @@
+:root {
+  --accent: #3B5BA5;
+  --plus: #2F9E63;
+  --minus: #D9534F;
+  --bg: #FAF8F3;
+  --card: #FFFFFF;
+  --ink: #2B2622;
+  --muted: #8A8178;
+  --line: #E6E0D6;
+  --soft: #F1EDE5;
+  --radius: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg); color: var(--ink);
+  padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  -webkit-tap-highlight-color: transparent;
+}
+button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+main {
+  padding: 12px 12px 16px;
+  padding-left: calc(12px + env(safe-area-inset-left));
+  padding-right: calc(12px + env(safe-area-inset-right));
+}
+
+/* 顶栏 */
+.topbar { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.topbar .date { flex: 1; text-align: center; font-size: 17px; font-weight: 600; }
+.topbar .date small { display: block; font-size: 12px; color: var(--muted); font-weight: 400; }
+.iconbtn { width: 44px; height: 44px; border-radius: 50%; background: var(--card); font-size: 20px; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+.actions { display: flex; gap: 8px; margin-bottom: 10px; }
+.btn { flex: 1; height: 44px; border-radius: var(--radius); background: var(--card); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+.btn.primary { background: var(--accent); color: #fff; }
+.btn:disabled { opacity: .45; }
+
+/* 空状态 */
+.empty { text-align: center; padding: 48px 16px; color: var(--muted); }
+.empty img { width: 200px; height: auto; margin-bottom: 8px; }
+.empty p { margin-bottom: 16px; }
+.empty .btn { flex: none; width: 70%; margin: 0 auto; }
+
+/* 底部标签 */
+.tabs { position: fixed; left: 0; right: 0; bottom: 0; display: flex; background: var(--card); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); }
+.tab { flex: 1; height: 56px; font-size: 15px; color: var(--muted); }
+.tab.active, .tab[aria-current] { color: var(--accent); font-weight: 700; }
+
+/* 提示 */
+.toast { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); background: rgba(43,38,34,.92); color: #fff; padding: 10px 16px; border-radius: 20px; font-size: 14px; z-index: 50;
+  display: flex; align-items: center; width: max-content; max-width: calc(100vw - 32px); }
+.toast[hidden] { display: none; }
+.has-sheet .toast { bottom: auto; top: calc(12px + env(safe-area-inset-top)); }
+
+/* 弹层：备份、粘贴恢复、题库编辑、页内确认/输入框 */
+.sheet-mask { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 40; display: flex; align-items: flex-end; }
+.sheet { max-height: 85vh; overflow-y: auto; width: 100%; background: var(--card); border-radius: 18px 18px 0 0; padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); }
+.sheet h2 { font-size: 17px; margin-bottom: 10px; }
+.sheet textarea { font: inherit; width: 100%; min-height: 180px; border: 1px solid var(--line); border-radius: 10px; padding: 10px; font-size: 16px; line-height: 1.5; resize: vertical; }
+.sheet input { width: 100%; height: 44px; border: 1px solid var(--line); border-radius: 10px; padding: 0 10px; font-size: 16px; }
+.sheet .msg { font-size: 16px; line-height: 1.5; padding: 4px 0 2px; }
+.sheet .row { display: flex; gap: 8px; margin-top: 12px; }
+.sheet .btn:not(.primary), .section .btn:not(.primary) { background: var(--soft); }
+
+/* 设置页 */
+.section { background: var(--card); border-radius: var(--radius); padding: 12px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.section h2 { font-size: 15px; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+.item { display: flex; align-items: center; gap: 8px; min-height: 44px; border-bottom: 1px solid var(--line); }
+.item:last-child { border-bottom: 0; }
+.item .label { flex: 1; font-size: 16px; }
+.item .small { flex: none; min-width: 44px; height: 44px; padding: 0 10px; border-radius: 10px; background: var(--soft); font-size: 13px; }
+.item .small:disabled { opacity: .45; }
+.addrow { display: flex; gap: 8px; margin-top: 8px; }
+.addrow input { flex: 1; height: 44px; border: 1px solid var(--line); border-radius: 10px; padding: 0 10px; font-size: 16px; }
+.addrow .btn { flex: none; width: 88px; }
+.tpl label { display: block; font-size: 13px; color: var(--muted); margin: 8px 0 4px; }
+.tpl input { width: 100%; height: 40px; border: 1px solid var(--line); border-radius: 10px; padding: 0 10px; font-size: 16px; }
+.hint { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+.foot { text-align: center; color: var(--muted); font-size: 12px; line-height: 1.6; padding: 16px 0 4px; }
+
+/* 分段开关 */
+.seg { display: inline-flex; background: var(--soft); border-radius: 12px; padding: 3px; margin-bottom: 10px; }
+.seg button { min-height: 44px; padding: 0 14px; border-radius: 10px; font-size: 14px; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--card); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+
+/* toast 撤销按钮 */
+/* 负外边距：按钮点按区够 44px 高，又不把提示条撑高 */
+.toast button { flex: none; min-width: 44px; min-height: 44px; margin: -12px -8px -12px 8px; padding: 0 8px; color: #C9D6F2; font-weight: 700; text-decoration: underline; }
+
+/* 弹层标题小字、对话框 */
+.sheet h2 small { margin-left: 8px; font-size: 14px; font-weight: 400; color: var(--muted); }
+.sheet label { display: block; font-size: 13px; color: var(--muted); margin: 8px 0 4px; }
+.sheet .err { min-height: 1.4em; margin-top: 8px; font-size: 14px; color: var(--minus); }
+
+/* 弹层里的分段开关铺满 */
+.sheet .seg { display: flex; }
+.sheet .seg button { flex: 1; }
+
+/* 设置页：输入框、多行添加框、危险按钮 */
+.section .field { width: 100%; height: 44px; border: 1px solid var(--line); border-radius: 10px; padding: 0 10px; font: inherit; font-size: 16px; }
+.addrow textarea { flex: 1; min-width: 0; min-height: 44px; border: 1px solid var(--line); border-radius: 10px; padding: 10px; font: inherit; font-size: 16px; line-height: 1.4; resize: vertical; }
+.section .addrow .btn:only-child { width: 100%; flex: 1; }
+.item .label { min-width: 0; overflow-wrap: anywhere; }
+.btn.danger { color: var(--minus); }
+
+/* 大字区：点名 / 抽题 */
+.stage { min-height: 45vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 16px; background: var(--card); border-radius: var(--radius); box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.stage .name { font-size: clamp(56px, 16vw, 160px); font-weight: 800; color: var(--accent); line-height: 1.1; word-break: break-all; }
+.stage .name.rolling { color: var(--muted); }
+.stage .name.landed { animation: pop .25s ease-out; }
+@keyframes pop { from { transform: scale(.92); } to { transform: scale(1); } }
+.stage .hint { color: var(--muted); font-size: 18px; }
+.stage .who { font-size: clamp(28px, 8vw, 64px); font-weight: 700; color: var(--accent); margin-bottom: 12px; }
+.stage .q { font-size: clamp(28px, 6vw, 56px); font-weight: 600; line-height: 1.35; max-height: 8.2em; overflow-y: auto; word-break: break-word; }
+.answer { margin-top: 14px; background: var(--soft); border-radius: 12px; padding: 12px 14px; font-size: 20px; line-height: 1.5; text-align: left; }
+.bigbtn { width: 100%; height: 64px; border-radius: var(--radius); background: var(--accent); color: #fff; font-size: 22px; font-weight: 700; margin-top: 12px; }
+.bigbtn:disabled { opacity: .5; }
+.small-row { display: flex; gap: 8px; margin-top: 10px; }
+.small-row .btn { height: 44px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.chip { background: var(--soft); border-radius: 999px; padding: 6px 12px; font-size: 14px; }
+.chip.absent { color: var(--muted); text-decoration: line-through; }
+body.fullscreen main { padding: 12px; } body.fullscreen .tabs, body.fullscreen .fs-hide { display: none; }
+body.fullscreen .stage { min-height: calc(100vh - 140px); }
+body.fullscreen .stage .name { font-size: clamp(80px, 22vw, 240px); }
+body.fullscreen .stage .q { font-size: clamp(36px, 7vw, 80px); max-height: calc(100vh - 260px); overflow-y: auto; }
+.fs-exit { position: fixed; top: calc(10px + env(safe-area-inset-top)); right: 12px; height: 44px; padding: 0 14px; border-radius: 22px; background: var(--card); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+select.field { height: 44px; font-size: 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); padding: 0 10px; }
+
+/* 点名页顶栏：剩余人数 + 文字小按钮 */
+.topbar .left { flex: 1; font-size: 17px; font-weight: 600; }
+.iconbtn.text { width: auto; min-width: 44px; padding: 0 14px; border-radius: 22px; font-size: 15px; }
+.iconbtn:disabled { opacity: .45; }
+/* 本轮已抽：折叠列表 */
+.drawn { margin-top: 12px; }
+.drawn summary { min-height: 44px; display: flex; align-items: center; color: var(--muted); font-size: 15px; cursor: pointer; }
+.drawn summary::before { content: "▸"; margin-right: 6px; }
+.drawn[open] summary::before { content: "▾"; }
+.drawn summary::-webkit-details-marker { display: none; }
+.drawn summary { list-style: none; }
+
+/* 抽题页：顶栏下拉占一整行，下面一行剩余题数 + 按钮 */
+.quizbar { flex-wrap: wrap; }
+.quizbar select.field { flex: 1 1 100%; min-width: 0; }
+.stage .q.rolling, .stage .who.rolling { color: var(--muted); }
+.stage .q.landed, .stage .who.landed { animation: pop .25s ease-out; }
+.stage .ansbtn { flex: none; min-width: 120px; padding: 0 20px; margin-top: 14px; background: var(--soft); }
+.stage .answer { width: 100%; max-width: 40em; }
+body.fullscreen .answer { font-size: clamp(20px, 3vw, 36px); }
+
+/* 开关：同时点名、自动朗读 */
+.switch-row { margin-bottom: 10px; }
+.toggle { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 4px; font-size: 16px; }
+.toggle .knob { position: relative; width: 44px; height: 26px; border-radius: 13px; background: var(--line); transition: background .15s; flex: none; }
+.toggle .knob::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); transition: transform .15s; }
+.toggle[aria-pressed="true"] .knob { background: var(--accent); }
+.toggle[aria-pressed="true"] .knob::after { transform: translateX(18px); }
+
+/* 设置页：名单多行框 */
+.section textarea.field { height: auto; min-height: 132px; padding: 10px; line-height: 1.5; resize: vertical; }
+/* 投屏时题目不限高，关掉滚动，免得小数像素取整冒出 1px 滚动条（Windows 投影电脑会显示出来） */
