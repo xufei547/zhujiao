@@ -289,8 +289,24 @@ export function renderList(root, p) {
         el("button", { class: "btn", text: "恢复", onClick: () => file.click() }),
         el("button", { class: "btn", text: "粘贴恢复", onClick: p.onPasteRestore }),
       ]),
-      p.inApp ? el("p", { class: "hint", text: "微信/小红书里打开不能存文件：点「备份」会显示一段文字，长按复制保存；恢复时用「粘贴恢复」。" }) : null,
+      p.inApp ? el("p", { class: "hint", text: "小红书等 App 内打开不能存文件：点「备份」会显示一段文字，长按复制保存；恢复时用「粘贴恢复」。" }) : null,
       file,
+    ])
+  );
+
+  // 多老师合用：各自记分，班主任合并备份
+  const mergeFile = el("input", { type: "file", accept: "application/json,.json", hidden: "" });
+  mergeFile.addEventListener("change", () => { if (mergeFile.files[0]) p.onMergeFile(mergeFile.files[0]); mergeFile.value = ""; });
+  root.append(
+    el("section", { class: "section" }, [
+      el("h2", { text: "多老师合用" }),
+      el("p", { class: "hint", text: "每位老师在自己手机上记分，期末把备份发给班主任。班主任在这里合并：同名孩子的分数相加，重复的记录只算一次，现有数据不会被覆盖。" }),
+      el("div", { class: "addrow" }, [
+        el("button", { class: "btn", text: "选文件合并", onClick: () => mergeFile.click() }),
+        el("button", { class: "btn", text: "粘贴合并", onClick: p.onPasteMerge }),
+      ]),
+      p.inApp ? el("p", { class: "hint", text: "小红书等 App 内打开不能选文件，用「粘贴合并」。" }) : null,
+      mergeFile,
     ])
   );
   root.append(

@@ -294,7 +294,8 @@ export function createStore(storage) {
     };
   }
 
-  function importBackup(obj) {
+  // 校验并清洗备份：不是本 App 的备份返回 null
+  function parseBackup(obj) {
     const ok =
       isPlainObject(obj) &&
       obj.app === "班级积分" &&
@@ -302,17 +303,15 @@ export function createStore(storage) {
       Array.isArray(obj.students) &&
       Array.isArray(obj.reasons) &&
       Array.isArray(obj.events);
-    if (!ok) return { ok: false, error: "不是班级积分的备份" };
-
-    // 先全部校验清洗，再一次性写入
+    if (!ok) return null;
     const name = isPlainObject(obj.class) && typeof obj.class.name === "string" && obj.class.name.trim()
       ? Array.from(obj.class.name.trim()).slice(0, CLASS_NAME_MAX).join("")
       : DEFAULT_CLASS_NAME;
-    const students = cleanStudents(obj.students);
-    const reasons = cleanReasons(obj.reasons);
-    const events = cleanEvents(obj.events);
+    return { name, students: cleanStudents(obj.students), reasons: cleanReasons(obj.reasons), events: cleanEvents(obj.events) };
+  }
 
-    // 原子化：先快照五个键的原始字符串，任何一步写失败就全部写回
+  // 原子化：先快照五个键的原始字符串，fn 里任何一步写失败就全部写回并返回 { ok: false, error }
+  function writeAll(fn) {
     const keys = [KEYS.klass, KEYS.students, KEYS.reasons, KEYS.events, KEYS.version];
     const snapshot = keys.map((key) => {
       try {
@@ -322,11 +321,7 @@ export function createStore(storage) {
       }
     });
     try {
-      writeJSON(storage, KEYS.klass, { name });
-      writeJSON(storage, KEYS.students, students);
-      writeJSON(storage, KEYS.reasons, reasons);
-      writeJSON(storage, KEYS.events, events);
-      writeRaw(storage, KEYS.version, "1");
+      return fn();
     } catch (err) {
       for (const { key, known, raw } of snapshot) {
         if (!known) continue;
@@ -334,13 +329,99 @@ export function createStore(storage) {
           if (raw == null) storage.removeItem(key);
           else storage.setItem(key, raw);
         } catch (e) {
-          console.warn(`[store] 恢复失败后写回 ${key} 也失败`, e);
+          console.warn(`[store] 写入失败后写回 ${key} 也失败`, e);
         }
       }
       return { ok: false, error: err.message || FULL_MSG };
     }
-    fallbackReasons = null;
-    return { ok: true, counts: { students: students.length, reasons: reasons.length, events: events.length } };
+  }
+
+  // 恢复：整份覆盖
+  function importBackup(obj) {
+    const b = parseBackup(obj);
+    if (!b) return { ok: false, error: "不是班级积分的备份" };
+    return writeAll(() => {
+      writeJSON(storage, KEYS.klass, { name: b.name });
+      writeJSON(storage, KEYS.students, b.students);
+      writeJSON(storage, KEYS.reasons, b.reasons);
+      writeJSON(storage, KEYS.events, b.events);
+      writeRaw(storage, KEYS.version, "1");
+      fallbackReasons = null;
+      return { ok: true, counts: { students: b.students.length, reasons: b.reasons.length, events: b.events.length } };
+    });
+  }
+
+  // 合并另一位老师的备份：不覆盖现有数据，班级名、名单顺序、理由、记录都保留。
+  // 学生按姓名匹配（同名沿用本机 id，新名字追加到末尾）；记录按 id 去重、studentId 改写成本机 id；理由按 label 补缺。
+  function mergeBackup(obj) {
+    const b = parseBackup(obj);
+    if (!b) return { ok: false, error: "不是班级积分的备份" };
+    return writeAll(() => {
+      // 在快照之后读本机数据：理由键缺失时 getReasons 写入的默认值也能一起回滚
+      const students = getStudents();
+      const reasons = getReasons();
+      const events = getEvents();
+
+      // 学生：姓名 → 本机 id；备份 id → 本机 id
+      const byName = new Map();
+      for (const s of students) {
+        const n = typeof s.name === "string" ? s.name.trim() : "";
+        if (n && !byName.has(n)) byName.set(n, s.id);
+      }
+      // 已占用的 id 要连本机记录里的 studentId 一起算：删掉的孩子记录还留着，新学生若沿用那个 id 会把旧分捡走
+      const takenIds = new Set(students.map((s) => s.id));
+      for (const e of events) takenIds.add(e.studentId);
+      const idMap = new Map();
+      const newStudents = [];
+      for (const s of b.students) {
+        if (idMap.has(s.id)) continue;
+        let id = byName.get(s.name);
+        if (id === undefined) {
+          id = takenIds.has(s.id) ? newId() : s.id;
+          takenIds.add(id);
+          byName.set(s.name, id);
+          newStudents.push({ id, name: s.name });
+        }
+        idMap.set(s.id, id);
+      }
+
+      // 记录：id 已在本机的算重复；备份名单里找不到学生的（对方已删）跳过
+      const eventIds = new Set(events.map((e) => e.id));
+      const newEvents = [];
+      let duplicates = 0;
+      for (const e of b.events) {
+        if (eventIds.has(e.id)) {
+          duplicates += 1;
+          continue;
+        }
+        const sid = idMap.get(e.studentId);
+        if (sid === undefined) continue;
+        eventIds.add(e.id);
+        newEvents.push({ ...e, studentId: sid });
+      }
+
+      // 理由：本机没有的 label 追加到末尾，已有的不动
+      const labels = new Set(reasons.map((r) => (typeof r.label === "string" ? r.label.trim() : r.label)));
+      const reasonIds = new Set(reasons.map((r) => r.id));
+      const newReasons = [];
+      for (const r of b.reasons) {
+        if (labels.has(r.label)) continue;
+        const id = reasonIds.has(r.id) ? newId() : r.id;
+        labels.add(r.label);
+        reasonIds.add(id);
+        newReasons.push({ id, label: r.label, delta: r.delta });
+      }
+
+      writeJSON(storage, KEYS.students, [...students, ...newStudents]);
+      writeJSON(storage, KEYS.reasons, [...reasons, ...newReasons]);
+      writeJSON(storage, KEYS.events, [...events, ...newEvents]);
+      writeRaw(storage, KEYS.version, "1");
+      fallbackReasons = null;
+      return {
+        ok: true,
+        counts: { students: newStudents.length, events: newEvents.length, duplicates, reasons: newReasons.length },
+      };
+    });
   }
 
   // 版本戳尽力写，存储不可用时吞掉，不能让构造失败
@@ -355,6 +436,6 @@ export function createStore(storage) {
     getStudents, setStudents, addStudent, addStudents, renameStudent, removeStudent, moveStudent,
     getReasons, setReasons, addReason, updateReason, removeReason, moveReason, resetReasons,
     getEvents, addEvent, addEvents, removeEvent, removeBatch, clearEvents,
-    exportBackup, importBackup,
+    exportBackup, importBackup, mergeBackup,
   };
 }

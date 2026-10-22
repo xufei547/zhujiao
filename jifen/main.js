@@ -14,9 +14,10 @@ const { storage, blocked: storageBlocked } = openStorage(() => window.localStora
 const store = createStore(storage);
 const root = document.getElementById("view");
 const state = { view: "points", sortMode: "list", logFilter: "today", today: dateKey() };
-// 微信/小红书内置浏览器下载不了文件，备份要改走复制
+// 小红书等 App 内置浏览器下载不了文件，备份要改走复制
 const inApp = isInAppBrowser(navigator.userAgent);
 const RESTORE_CONFIRM = "恢复会覆盖手机里现在的全部数据，继续？";
+const MERGE_CONFIRM = "把另一位老师的备份合并进来？现在的数据不会被覆盖，同名孩子的分数相加，重复的记录只算一次。";
 
 // 老办法复制：隐藏 textarea + execCommand("copy")，给没有/不让用 clipboard API 的内置浏览器
 function legacyCopy(text) {
@@ -258,6 +259,29 @@ function restoreFrom(text) {
   return true;
 }
 
+// 合并：成功 toast 新增人数/记录数（有重复、新理由时一并说明）+ 重渲染返回 true；失败 toast 原因并返回 false
+function mergeFrom(text) {
+  let obj;
+  try {
+    obj = JSON.parse(text);
+  } catch {
+    showToast("不是班级积分的备份");
+    return false;
+  }
+  const res = store.mergeBackup(obj);
+  if (!res.ok) {
+    showToast(res.error || "合并失败");
+    return false;
+  }
+  rerender();
+  const { students, events, duplicates, reasons } = res.counts;
+  let msg = `已合并：新增 ${students} 人，${events} 条记录`;
+  if (duplicates > 0) msg += `，${duplicates} 条重复已跳过`;
+  if (reasons > 0) msg += `，新增 ${reasons} 个理由`;
+  showToast(msg, 4000);
+  return true;
+}
+
 function renderListView() {
   const students = store.getStudents();
   const reasons = store.getReasons();
@@ -334,7 +358,7 @@ function renderListView() {
     onBackup() {
       const json = JSON.stringify(store.exportBackup());
       if (inApp) {
-        // 微信/小红书内置浏览器下载不了文件：显示文本让老师复制保存
+        // 小红书等 App 内置浏览器下载不了文件：显示文本让老师复制保存
         openSheet({ title: "备份内容，长按复制保存", text: json, onCopy: copyText, label: "备份内容" });
         return;
       }
@@ -364,6 +388,28 @@ function renderListView() {
         async onPrimary(text) {
           if (!(await askConfirm(RESTORE_CONFIRM))) return false;
           return restoreFrom(text);
+        },
+      });
+    },
+    async onMergeFile(file) {
+      if (!(await askConfirm(MERGE_CONFIRM, { okLabel: "合并" }))) return;
+      let text;
+      try {
+        text = await readFileText(file);
+      } catch {
+        showToast("读不出这个文件");
+        return;
+      }
+      mergeFrom(text);
+    },
+    onPasteMerge() {
+      openTextSheet({
+        title: "粘贴另一位老师的备份",
+        placeholder: "把对方点「备份」后复制的内容粘贴到这里",
+        primaryLabel: "合并",
+        async onPrimary(text) {
+          if (!(await askConfirm(MERGE_CONFIRM, { okLabel: "合并" }))) return false;
+          return mergeFrom(text);
         },
       });
     },
