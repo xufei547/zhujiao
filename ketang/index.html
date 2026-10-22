@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#7C3AED">
+<title>课堂互动</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main id="view"></main>
+<nav class="tabs">
+  <button class="tab" data-view="timer" aria-label="倒计时">倒计时</button>
+  <button class="tab" data-view="groups" aria-label="分组">分组</button>
+  <button class="tab" data-view="wheel" aria-label="转盘">转盘</button>
+  <button class="tab" data-view="scores" aria-label="计分">计分</button>
+  <button class="tab" data-view="settings" aria-label="设置">设置</button>
+</nav>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<script type="module" src="main.js"></script>
+</body>
+</html>
